@@ -1,0 +1,67 @@
+containers:
+  dev-env:
+    image: node:12.18.4
+    volumes:
+      - local: .
+        container: /code
+        options: cached
+      - type: cache
+        name: node_modules
+        container: /code/node_modules
+    working_directory: /code
+    run_as_current_user:
+      enabled: true
+      home_directory: /home/container-user
+    environment:
+      REGION: ${REGION:-ap-southeast-1}
+      AWS_REGION: ${REGION:-ap-southeast-1}
+      AWS_ACCESS_KEY_ID: ${AWS_ACCESS_KEY_ID:-}
+      AWS_SECRET_ACCESS_KEY: ${AWS_SECRET_ACCESS_KEY:-}
+      AWS_SESSION_TOKEN: ${AWS_SESSION_TOKEN:-}
+
+tasks:
+  get-node-deps:
+    description: Install node dependencies
+    run:
+      container: dev-env
+      command: npm install
+
+  build:
+    description: Build
+    prerequisites:
+      - get-node-deps
+    run:
+      container: dev-env
+      command: npm run build
+
+  test:
+    description: run unit test
+    prerequisites:
+      - build
+    run:
+      container: dev-env
+      command: npm run test
+  
+  test:integration:
+    description: run unit test
+    prerequisites:
+      - build
+    run:
+      container: dev-env
+      command: npm run test:integration
+
+  lint:
+    description: Install node dependencies
+    prerequisites:
+      - get-node-deps
+    run:
+      container: dev-env
+      command: npm run lint
+
+  prepush:
+    description: run test before push code
+    prerequisites:
+      - lint
+      - test            
+      - test:integration
+    
