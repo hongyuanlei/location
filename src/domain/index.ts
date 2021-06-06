@@ -11,7 +11,7 @@ export const createLocationChangeRequestService = (
         location: {
           ...changeRequest.location,
         },
-        userId: changeRequest.userId,
+        creatorId: changeRequest.userId,
       });
     },
   };
@@ -46,7 +46,7 @@ export interface ChangeRequestRepository {
     createdAt: Date;
     updatedAt: Date;
     status: "SUBMITTED";
-    userId: number;
+    creatorId: number;
     location: Location;
   }) => Promise<ChangeRequest>;
 }
@@ -63,6 +63,7 @@ export interface ChangeRequest {
   declinedAt?: Date;
   remark?: string;
   status: "SUBMITTED";
-  userId: number;
+  creatorId: number;
+  approverId?: number;
   location: Location;
 }

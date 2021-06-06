@@ -19,6 +19,18 @@ containers:
       AWS_SECRET_ACCESS_KEY: ${AWS_SECRET_ACCESS_KEY:-}
       AWS_SESSION_TOKEN: ${AWS_SESSION_TOKEN:-}
 
+  database:
+    image: mysql:5.7.8
+    environment:
+      MYSQL_DATABASE: cms
+      MYSQL_ROOT_PASSWORD: password
+    health_check:
+      command: mysqladmin ping -h localhost
+      interval: 10s
+      retries: 3
+    ports:
+      - 3306:3306
+
 tasks:
   get-node-deps:
     description: Install node dependencies
@@ -26,18 +38,10 @@ tasks:
       container: dev-env
       command: npm install
 
-  build:
-    description: Build
-    prerequisites:
-      - get-node-deps
-    run:
-      container: dev-env
-      command: npm run build
-
   test:
     description: run unit test
     prerequisites:
-      - build
+      - get-node-deps
     run:
       container: dev-env
       command: npm run test
@@ -45,7 +49,9 @@ tasks:
   test:integration:
     description: run unit test
     prerequisites:
-      - build
+      - get-node-deps
+    dependencies:
+      - database
     run:
       container: dev-env
       command: npm run test:integration
@@ -64,4 +70,13 @@ tasks:
       - lint
       - test            
       - test:integration
-    
+
+  dev:
+    description: dev
+    prerequisites:
+      - get-node-deps
+    dependencies:
+      - database
+    run:
+      container: dev-env
+      command: bash
