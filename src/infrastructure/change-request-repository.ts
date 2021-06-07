@@ -48,7 +48,7 @@ const add =
   }): Promise<ChangeRequest> => {
     const { createdAt, updatedAt, status, creatorId, location } = changeRequest;
 
-    return await respository.save({
+    const searableChangeRequest = await respository.save({
       locationId: location.id,
       location,
       createdAt,
@@ -56,11 +56,13 @@ const add =
       creatorId,
       status,
     });
+    return new ChangeRequest(searableChangeRequest);
   };
 
 export const createChangeRequestRepository = (connection: Connection): ChangeRequestRepository => {
   const repository: Repository<SearchableChangeRequest> = connection.getRepository(SearchableChangeRequest);
   return {
     add: add(repository),
+    getLatestByLocationId: (locationId: string) => Promise.resolve(undefined),
   };
 };
