@@ -72,7 +72,7 @@ export class ChangeRequest {
   approvedAt?: Date;
   declinedAt?: Date;
   remark?: string;
-  status: "SUBMITTED";
+  status: "SUBMITTED" | "REJECTED" | "APPROVED";
   creatorId: number;
   approverId?: number;
   location: Location;
@@ -84,7 +84,7 @@ export class ChangeRequest {
     approvedAt?: Date;
     declinedAt?: Date;
     remark?: string;
-    status: "SUBMITTED";
+    status: "SUBMITTED" | "REJECTED" | "APPROVED";
     creatorId: number;
     approverId?: number;
     location: Location;
