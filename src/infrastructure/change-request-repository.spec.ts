@@ -64,4 +64,47 @@ describe("change-request-repository", () => {
     expect(result.status).toEqual("SUBMITTED");
     expect(result.location).toEqual(location);
   });
+
+  it("get latest change request by locationId", async () => {
+    const location = {
+      id: "1234",
+      status: "ACTIVE",
+      geoCoordinate: {
+        latitude: 11.111,
+        longitude: 121.111,
+      },
+      name: {
+        displayName: {
+          "en-GB": "BUILDING en-GB",
+          "zh-CN": "BUILDING zh-CN",
+          "zh-HK": "BUILDING zh-HK",
+        },
+      },
+    };
+
+    const changeRequest1 = {
+      location,
+      creatorId: 1001,
+      createdAt: new Date("2021-06-06T12:00:00Z"),
+      updatedAt: new Date("2021-06-06T12:00:00Z"),
+      status: "APPROVED" as any,
+    };
+
+    const changeRequest2 = {
+      location,
+      creatorId: 1001,
+      createdAt: new Date("2021-06-07T12:00:00Z"),
+      updatedAt: new Date("2021-06-07T12:00:00Z"),
+      status: "SUBMITTED" as any,
+    };
+
+    const changeRequestRepository = createChangeRequestRepository(connection);
+
+    await changeRequestRepository.add(changeRequest1);
+    await changeRequestRepository.add(changeRequest2);
+    const result = await changeRequestRepository.getLatestByLocationId(location.id);
+
+    expect(result.createdAt).toEqual(new Date("2021-06-07T12:00:00Z"));
+    expect(result.location.id).toEqual(location.id);
+  });
 });

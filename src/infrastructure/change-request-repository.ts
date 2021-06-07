@@ -59,10 +59,24 @@ const add =
     return new ChangeRequest(searableChangeRequest);
   };
 
+const getLatestByLocationId =
+  (respository: Repository<SearchableChangeRequest>) =>
+  async (locationId: string): Promise<ChangeRequest> => {
+    const searableChangeRequest = await respository.findOne({
+      where: {
+        locationId,
+      },
+      order: {
+        createdAt: "DESC",
+      },
+    });
+    return new ChangeRequest(searableChangeRequest);
+  };
+
 export const createChangeRequestRepository = (connection: Connection): ChangeRequestRepository => {
   const repository: Repository<SearchableChangeRequest> = connection.getRepository(SearchableChangeRequest);
   return {
     add: add(repository),
-    getLatestByLocationId: (locationId: string) => Promise.resolve(undefined),
+    getLatestByLocationId: getLatestByLocationId(repository),
   };
 };
